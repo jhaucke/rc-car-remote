@@ -1,4 +1,13 @@
+# Eclipse Files
+target/
+.settings/
+.project
+.classpath
+
 *.class
+
+# Log Files
+*.log
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
