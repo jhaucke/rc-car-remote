@@ -1,0 +1,24 @@
+#!/bin/bash
+
+### BEGIN INIT INFO
+# Provides:             piUdpServer
+# Required-Start:       $remote_fs $syslog
+# Required-Stop:        $remote_fs $syslog
+# Default-Start:        2 3 4 5
+# Default-Stop:         0 1 6
+# Short-Description:    server to receive udp packages
+### END INIT INFO
+
+case $1 in
+    start)
+        /bin/bash /usr/local/bin/piUdpServer-start.sh
+    ;;
+    stop)
+        /bin/bash /usr/local/bin/piUdpServer-stop.sh
+    ;;
+    restart)
+        /bin/bash /usr/local/bin/piUdpServer-stop.sh
+        /bin/bash /usr/local/bin/piUdpServer-start.sh
+    ;;
+esac
+exit 0

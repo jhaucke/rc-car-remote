@@ -8,6 +8,11 @@ import java.net.InetAddress;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * This class permanently transmits control values to the car. The currently
+ * available control values are the static variables in this class. To change
+ * them, use the provided setter methods.
+ */
 public class Transmitter implements Runnable {
 
 	private final Logger logger;
@@ -42,7 +47,7 @@ public class Transmitter implements Runnable {
 
 				socket.send(packet);
 
-				Thread.sleep(10);
+				Thread.sleep(50);
 			}
 		} catch (IOException | InterruptedException e) {
 			String newLine = System.getProperty("line.separator");
