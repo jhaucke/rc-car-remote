@@ -4,17 +4,40 @@
 
 	<groupId>com.github.jhaucke</groupId>
 	<artifactId>CarRemoteFX</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>CarRemoteFX</name>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<pi.host>169.254.0.xx</pi.host>
+		<pi.deployPath>/home/pi/java/jar</pi.deployPath>
+		<pi.user>pi</pi.user>
+		<pi.password>raspberry</pi.password>
 	</properties>
 
 	<build>
 		<plugins>
+			<!-- Build jar -->
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifest>
+							<mainClass>com.github.jhaucke.carremotefx.CarRemoteFX</mainClass>
+						</manifest>
+					</archive>
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>package</phase>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -23,6 +46,46 @@
 					<source>1.8</source>
 					<target>1.8</target>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.8</version>
+				<executions>
+					<execution>
+						<phase>install</phase>
+						<configuration>
+							<target>
+								run a command on the remote server (here mkdir)
+								<sshexec command="mkdir -p ${pi.deployPath}" host="${pi.host}"
+									password="${pi.password}" port="22" trust="true" username="${pi.user}"></sshexec>
+								copy the shaded jar to the raspberry pi on install
+								<scp failonerror="true"
+									todir="${pi.user}:${pi.password}@${pi.host}:${pi.deployPath}"
+									trust="true">
+									<fileset
+										file="${project.basedir}/target/${project.artifactId}-${project.version}-jar-with-dependencies.jar">
+									</fileset>
+								</scp>
+								run a command on the remote server (run jar file)
+								<sshexec
+									command="sudo java -Djava.ext.dirs=/home/pi/java/armv6hf-sdk/rt/lib/ext -jar ${pi.deployPath}/${project.artifactId}-${project.version}-jar-with-dependencies.jar"
+									host="${pi.host}" password="${pi.password}" port="22" trust="true"
+									username="${pi.user}"></sshexec>
+							</target>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
+				<dependencies>
+					<dependency>
+						<groupId>org.apache.ant</groupId>
+						<artifactId>ant-jsch</artifactId>
+						<version>1.9.4</version>
+					</dependency>
+				</dependencies>
 			</plugin>
 		</plugins>
 	</build>
